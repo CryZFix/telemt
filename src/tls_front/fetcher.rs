@@ -1530,9 +1530,11 @@ mod tests {
     use std::time::{Duration, Instant};
 
     use super::{
-        ProfileCacheValue, TlsFetchStrategy, build_client_hello, build_tls_fetch_proxy_header,
-        derive_behavior_profile, encode_tls13_certificate_message, fetch_via_rustls_stream,
-        order_profiles, profile_alpn, profile_cache, profile_cache_key,
+        MLKEM768_CLIENT_ENCAPSULATION_KEY_LEN, ProfileCacheValue, TLS_NAMED_GROUP_X25519,
+        TLS_NAMED_GROUP_X25519MLKEM768, TlsFetchStrategy, X25519_KEY_SHARE_LEN,
+        build_client_hello, build_tls_fetch_proxy_header, derive_behavior_profile,
+        encode_tls13_certificate_message, fetch_via_rustls_stream, order_profiles, profile_alpn,
+        profile_cache, profile_cache_key,
     };
     use crate::config::TlsFetchProfile;
     use crate::crypto::SecureRandom;
