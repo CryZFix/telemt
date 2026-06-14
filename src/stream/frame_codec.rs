@@ -317,7 +317,7 @@ fn encode_secure(frame: &Frame, dst: &mut BytesMut, rng: &SecureRandom) -> io::R
         ));
     }
 
-    // Generate padding that keeps total length non-divisible by 4.
+    // Telegram Desktop VersionD uses a 4-bit random padding length.
     let padding_len = secure_padding_len(data.len(), rng);
 
     let total_len = data.len() + padding_len;
@@ -642,7 +642,7 @@ mod tests {
     }
 
     #[test]
-    fn secure_codec_always_adds_padding_and_jitters_wire_length() {
+    fn secure_codec_uses_tdesktop_padding_range_and_jitters_wire_length() {
         let codec = SecureCodec::new(Arc::new(SecureRandom::new()));
         let payload = Bytes::from_static(&[1, 2, 3, 4, 5, 6, 7, 8]);
         let mut wire_lens = HashSet::new();
@@ -652,13 +652,12 @@ mod tests {
             let mut out = BytesMut::new();
             codec.encode(&frame, &mut out).unwrap();
 
-            assert!(out.len() > 4 + payload.len());
             let wire_len = u32::from_le_bytes([out[0], out[1], out[2], out[3]]) as usize;
+            assert_eq!(out.len(), 4 + wire_len);
             assert!(
-                (payload.len() + 1..=payload.len() + 3).contains(&wire_len),
-                "Secure wire length must be payload+1..3, got {wire_len}"
+                (payload.len()..=payload.len() + 15).contains(&wire_len),
+                "Secure wire length must be payload+0..15, got {wire_len}"
             );
-            assert_ne!(wire_len % 4, 0, "Secure wire length must be non-4-aligned");
             wire_lens.insert(wire_len);
         }
 

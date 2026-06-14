@@ -311,7 +311,7 @@ impl<W: AsyncWrite + Unpin> SecureIntermediateFrameWriter<W> {
             ));
         }
 
-        // Add padding so total length is never divisible by 4 (MTProto Secure)
+        // Telegram Desktop VersionD uses a 4-bit random padding length.
         let padding_len = secure_padding_len(data.len(), &self.rng);
         let padding = self.rng.bytes(padding_len);
 
